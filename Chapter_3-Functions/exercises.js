@@ -28,7 +28,7 @@ console.log(isEven(-1));
 // 3.3 Bean counting
 const countChar = (word, targetCharacter) => {
     let count = 0;
-  for (letter of word) {
+  for (let letter of word) {
     if (letter === targetCharacter) {
       count++;
     } 
