@@ -48,7 +48,7 @@ const roadGraph = buildGraph(roads);
  * @param {string} place - Robot's current location.
  * @param {Array<{place: string, address: string}>} parcels - Array of parcel objects with `place` and `address`.
  */
-class VillageState {
+export class VillageState {
   constructor(place, parcels) {
     this.place = place;
     this.parcels = parcels;
@@ -108,7 +108,7 @@ function randomPick(array) {
  * @param {VillageState} state - The current state of the village.
  * @returns {{direction: string}} An object with random direction.
  */
-function randomRobot(state) {
+export function randomRobot(state) {
   return { direction: randomPick(roadGraph[state.place]) };
 }
 
@@ -157,14 +157,14 @@ const mailRoute = [
  * @param {string[]} memory - Robots memory
  * @returns {{direction: string, memory: string[]}} - An Object with the next direction and the updated memory.
  */
-function routeRobot(state, memory) {
+export function routeRobot(state, memory) {
   if (memory.length === 0) {
     memory = mailRoute;
   }
   return { direction: memory[0], memory: memory.slice(1) };
 }
 
-runRobot(VillageState.random(), routeRobot, []);
+// runRobot(VillageState.random(), routeRobot, []);
 
 // Robot finding route based on Breadth-First Search (BFS) algorithm
 
@@ -188,7 +188,7 @@ function findRoute(graph, from, to) {
   }
 }
 // TODO: Create docstring for the function
-function goalOrientedRobot({ place, parcels }, route) {
+export function goalOrientedRobot({ place, parcels }, route) {
   if (route.length === 0) {
     let parcel = parcels[0];
     if (parcel.place !== place) {
@@ -200,4 +200,4 @@ function goalOrientedRobot({ place, parcels }, route) {
   return { direction: route[0], memory: route.slice(1) };
 }
 
-// TODO: Execution of the goalOrientedRobot
+// runRobot(VillageState.random(), goalOrientedRobot, []);
