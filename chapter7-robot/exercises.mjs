@@ -3,6 +3,7 @@ import {
   randomRobot,
   routeRobot,
   goalOrientedRobot,
+  bestRobot,
 } from "./robot.mjs";
 
 // First exercise
@@ -48,4 +49,4 @@ function compareRobots(robot1, memory1, robot2, memory2) {
   );
 }
 
-compareRobots(randomRobot, [], goalOrientedRobot, []);
+compareRobots(bestRobot, [], goalOrientedRobot, []);

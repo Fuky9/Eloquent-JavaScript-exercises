@@ -82,7 +82,7 @@ export class VillageState {
  */
 function runRobot(state, robot, memory) {
   for (let turn = 0; ; turn++) {
-    if (state.parcels.length == 0) {
+    if (state.parcels.length === 0) {
       console.log(`Done in ${turn} turns`);
       break;
     }
@@ -187,7 +187,25 @@ function findRoute(graph, from, to) {
     }
   }
 }
-// TODO: Create docstring for the function
+
+/**
+ * Determines the best direction for the robot to move based on the parcels list
+ *
+ * The robot prioritizes handling the first parcel in its list. If * the parcel is not at the robot's
+ * current location, it calculates the shortest route to pick it up.* If the parcel is already at
+ * the robot's location, it calculates the route to deliver it to *  its destination. The chosen route
+ * is stored in memory for subsequent steps.
+ *
+ * @param {Object} param0 - Current state of the robot and the village.
+ * @param {string} param0.place - The robot's currrent location.
+ * @param {Array<{place: string, address: string}>} param0.parcels - List of parcels in the village each having:
+ * - `place`: The current location of the parcel.
+ * - `address`: The destination where the parcel needs to be delivered.
+ * @param {string[]} route - Current memory of the robot's planned route (can be empty)
+ * @returns {{direction: string, memory: string[]}} - An object containing:
+ *  - `direction`: The next location for the robot to move to.
+ *  - `memory`: The updated route after removing the first step.
+ */
 export function goalOrientedRobot({ place, parcels }, route) {
   if (route.length === 0) {
     let parcel = parcels[0];
@@ -201,3 +219,42 @@ export function goalOrientedRobot({ place, parcels }, route) {
 }
 
 // runRobot(VillageState.random(), goalOrientedRobot, []);
+
+/**
+ * Determines the best direction for the robot to move based on the shortest route and prioritizes picking up parcels slightly over delivering them.
+ *
+ * @param {Object} param0 - Current state of the robot and the village.
+ * @param {string} param0.place - The robot's currrent location.
+ * @param {Array<{place: string, address: string}>} param0.parcels - List of parcels in the village each having:
+ * - `place`: The current location of the parcel.
+ * - `address`: The destination where the parcel needs to be delivered.
+ * @param {string[]} route - Current memory of the robot's planned route (can be empty)
+ * @returns {{direction: string, memory: string[]}} - An object containing:
+ *  - `direction`: The next location for the robot to move to.
+ *  - `memory`: The updated route after removing the first step.
+ */
+export function bestRobot({ place, parcels }, route) {
+  if (route.length === 0) {
+    // Creates an array of objects {route: array, pickUp: boolean}
+    let routes = parcels.map((parcel) => {
+      if (parcel.place !== place) {
+        return {
+          route: findRoute(roadGraph, place, parcel.place),
+          pickUp: true,
+        };
+      } else {
+        return {
+          route: findRoute(roadGraph, place, parcel.address),
+          pickUp: false,
+        };
+      }
+    });
+    // Function for determining the score for the route (Shorter is better and picking up has slight bonus over delivering)
+    function score({ route, pickUp }) {
+      return (pickUp ? 0.5 : 0) - route.length;
+    }
+    // Finding the route with the best score
+    route = routes.reduce((a, b) => (score(a) > score(b) ? a : b)).route;
+  }
+  return { direction: route[0], memory: route.slice(1) };
+}
